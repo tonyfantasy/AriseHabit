@@ -2,12 +2,15 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Habit Tracker — прокачка персонажа</title>
   <meta name="description" content="Создайте персонажа и прокачивайте его, выполняя ежедневные цели. Уровни, достижения, серии.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -105,6 +108,24 @@
           </div>
         </div>
       </section>
+
+      <!-- Обратная связь в Telegram: подставьте токен бота и свой chat_id (см. README) -->
+      <section class="game-panel feedback-section" id="feedbackSection" data-feedback-bot-token="" data-feedback-chat-id="" aria-labelledby="feedbackTitle">
+        <h2 class="panel-title" id="feedbackTitle">Обратная связь</h2>
+        <p class="feedback-intro">Поделитесь опытом использования: что понравилось, что бы вы улучшили. Отзыв придёт в Telegram @antnndrv.</p>
+        <form id="feedbackForm" class="feedback-form">
+          <label class="field">
+            <span>Ваше имя (необязательно)</span>
+            <input type="text" id="feedbackName" placeholder="Как к вам обращаться?" maxlength="80" autocomplete="name">
+          </label>
+          <label class="field">
+            <span>Ваш отзыв</span>
+            <textarea id="feedbackMessage" placeholder="Расскажите, как вам приложение, что бы добавили или изменили..." rows="4" maxlength="1000" required></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary" id="feedbackSubmitBtn">Отправить в Telegram</button>
+        </form>
+        <p class="feedback-status" id="feedbackStatus" aria-live="polite"></p>
+      </section>
     </main>
 
     <div class="modal-overlay" id="modalOverlay" hidden>
@@ -139,6 +160,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="core.js"></script>
+  <script src="game-config.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

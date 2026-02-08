@@ -22,8 +22,14 @@
   --radius-panel: 10px;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   --shadow-panel: 0 0 0 1px var(--border), 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 212, 255, 0.06);
-  --font-sans: 'Outfit', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* Базовый размер для мобильных: 16px — удобочитаемость и отсутствие зума iOS при фокусе в input */
+  --text-base: 1rem;
+  --text-sm: 0.875rem;
+  --text-xs: 0.8125rem;
+  --line-tight: 1.4;
+  --line-normal: 1.5;
 }
 
 * {
@@ -36,12 +42,22 @@
   display: none !important;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 400;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  line-height: 1.5;
+  line-height: var(--line-normal);
+  /* Безопасные отступы для вырезов и индикатора дома */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ---------- Экран создания персонажа (Solo Leveling стиль) ---------- */
@@ -132,6 +148,13 @@ body {
   margin: 0 auto;
   padding: 1.25rem;
   min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.app-game .main {
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 /* ---------- Шапка (Solo Leveling стиль) ---------- */
@@ -225,14 +248,18 @@ body {
 .header-character-info {
   min-width: 0;
   flex: 1;
+  overflow: hidden;
 }
 
 .character-name {
-  font-weight: 700;
+  font-weight: 600;
   font-size: 1.1rem;
   color: var(--text);
   display: block;
   margin-bottom: 0.35rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .level-bar-wrap {
@@ -273,6 +300,8 @@ body {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--text-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .header-stats {
@@ -400,6 +429,7 @@ body {
 /* Календарь */
 .calendar-section .calendar-grid {
   display: block;
+  min-width: 0;
 }
 
 .calendar-weekdays {
@@ -516,11 +546,20 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
+  gap: 0.5rem;
+  min-width: 0;
 }
 
 .day-result-name {
   color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.day-result-pct {
+  flex-shrink: 0;
 }
 
 .day-result-pct {
@@ -730,11 +769,15 @@ body {
 .habit-info {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .habit-name {
   font-weight: 500;
+  font-size: 1rem;
   color: var(--text);
+  word-break: break-word;
+  line-height: var(--line-tight);
 }
 
 .habit-meta {
@@ -864,6 +907,7 @@ body {
   box-shadow: 0 0 0 1px var(--border), 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 60px rgba(0, 212, 255, 0.08);
   border: 1px solid var(--border);
   animation: slideUp 0.25s ease;
+  -webkit-overflow-scrolling: touch;
 }
 
 @keyframes slideUp {
@@ -889,6 +933,10 @@ body {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .btn-close {
@@ -1013,13 +1061,66 @@ body {
   border-top: 1px solid var(--border);
 }
 
+/* Обратная связь */
+.feedback-section.game-panel {
+  padding: 1.25rem;
+}
+
+.feedback-intro {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  line-height: var(--line-normal);
+}
+
+.feedback-form .field {
+  margin-bottom: 1rem;
+}
+
+.feedback-form textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  background: var(--surface-elevated);
+  color: var(--text);
+  resize: vertical;
+  min-height: 100px;
+}
+
+.feedback-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-dim);
+}
+
+.feedback-form .btn {
+  margin-top: 0.25rem;
+}
+
+.feedback-status {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  min-height: 1.25em;
+}
+
+.feedback-status-ok {
+  color: var(--success);
+}
+
+.feedback-status-err {
+  color: var(--danger);
+}
+
 /* Mental health — тёмная тема */
 .mental-section.game-panel {
   padding: 1.25rem;
 }
 
 .mental-intro {
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: var(--text-muted);
   margin-bottom: 1rem;
 }
@@ -1035,6 +1136,8 @@ body {
   min-height: 180px;
   max-height: 320px;
   overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -1089,10 +1192,11 @@ body {
 .mental-msg-bubble {
   max-width: 85%;
   padding: 0.5rem 0.85rem 0.6rem;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: var(--text-sm);
+  line-height: var(--line-normal);
   white-space: pre-wrap;
   word-break: break-word;
+  overflow-wrap: break-word;
   position: relative;
   box-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
@@ -1236,16 +1340,388 @@ body {
   flex-shrink: 0;
 }
 
-@media (max-width: 480px) {
-  .app {
+/* ========== Адаптация под мобильные устройства ========== */
+
+@media (max-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .app-game {
+    max-width: 100%;
+    padding: 0.75rem 1rem;
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .game-panel {
     padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .panel-title {
+    font-size: 0.8125rem;
+  }
+
+  .game-header {
+    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .character-name {
+    font-size: 1.05rem;
+  }
+
+  .level-label,
+  .level-xp {
+    font-size: 0.8125rem;
+  }
+
+  .level-bar {
+    max-width: 100px;
+  }
+
+  .chart-wrap {
+    height: 200px;
+  }
+
+  .chart-legend {
+    font-size: 0.8125rem;
+  }
+
+  .calendar-cell {
+    min-height: 44px;
+    padding: 3px 4px;
+  }
+
+  .calendar-day-num {
+    font-size: 0.8125rem;
+  }
+
+  .calendar-pct,
+  .calendar-xp {
+    font-size: 0.625rem;
+  }
+
+  .day-results-date,
+  .day-results-average {
+    font-size: 0.9375rem;
+  }
+
+  .habit-name {
+    font-size: 1rem;
+  }
+
+  .habit-meta {
+    font-size: 0.8125rem;
+  }
+
+  .mental-chat {
+    max-height: 260px;
+  }
+
+  .mental-msg-bubble {
+    font-size: 0.9375rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-game {
+    padding: 0.5rem 0.75rem;
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+  }
+
+  .create-character-screen {
+    padding: 1rem;
+  }
+
+  .create-character-card {
+    max-width: 100%;
+  }
+
+  .create-character-header h1 {
+    font-size: 1.375rem;
+    line-height: 1.3;
+  }
+
+  .create-character-header p {
+    font-size: 0.9375rem;
+  }
+
+  .create-character-form .field span {
+    font-size: 0.9375rem;
+  }
+
+  .game-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .header-character {
+    min-width: 0;
+  }
+
+  .level-bar-wrap {
+    flex-wrap: nowrap;
+  }
+
+  .level-bar {
+    min-width: 60px;
+    max-width: 100%;
+  }
+
+  .header-stats {
+    justify-content: flex-start;
+  }
+
+  /* Кнопки и интерактивные элементы — минимум 44px для удобного тапа */
+  .btn,
+  .btn-sm,
+  .btn-ghost,
+  .mental-choice-btn {
+    min-height: 44px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .btn-icon {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+  }
+
+  .btn-close {
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .habit-item {
     flex-wrap: wrap;
+    padding: 0.75rem 0;
+    gap: 0.5rem;
+  }
+
+  .habit-item:hover {
+    margin: 0 -0.25rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
   }
 
   .habit-progress-wrap {
     width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .habit-progress-dots {
+    gap: 0.25rem;
+  }
+
+  .habit-progress-dot {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+  }
+
+  .habit-progress-bar-wrap {
+    min-width: 60px;
+    max-width: 100%;
+    flex: 1;
+  }
+
+  .habit-actions .btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+  }
+
+  .section-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .section-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .achievements-section .achievements-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .achievement-item {
+    padding: 0.5rem 0.35rem;
+  }
+
+  .achievement-badge {
+    width: 40px;
+    height: 40px;
+  }
+
+  .achievement-icon {
+    font-size: 1.3rem;
+  }
+
+  .achievement-name {
+    font-size: 0.65rem;
+  }
+
+  .mental-telegram-wrap {
+    padding: 0.5rem 0;
+  }
+
+  .mental-chat {
+    min-height: 160px;
+    max-height: 220px;
+    padding: 0.5rem;
+  }
+
+  .mental-msg-bubble {
+    max-width: 92%;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.95rem;
+  }
+
+  .mental-keyboard {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .mental-choice-btn {
+    flex: 1 1 auto;
+    min-width: calc(50% - 0.3rem);
+    text-align: center;
+    font-size: 0.85rem;
+  }
+
+  .mental-reply {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .mental-reply input {
+    flex: 1 1 100%;
+    min-width: 0;
+    font-size: 16px; /* Предотвращает зум при фокусе на iOS */
+  }
+
+  .mental-reply .btn {
+    flex: 1 1 auto;
+    min-width: 120px;
+  }
+
+  /* Модалка на весь экран на узких экранах */
+  .modal-overlay {
+    padding: 0;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    align-items: flex-end;
+  }
+
+  .modal {
+    max-width: 100%;
+    border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+    max-height: 92vh;
+    overflow-y: auto;
+    margin: 0;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  #habitForm {
+    padding: 1rem;
+  }
+
+  .modal-actions {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .modal-actions .btn {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .reminder-row input[type="time"] {
+    font-size: 16px;
+  }
+
+  .field input[type="number"],
+  .field input[type="text"] {
+    font-size: 16px;
+  }
+
+  .feedback-form textarea {
+    font-size: 16px;
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-game {
+    padding: 0.5rem;
+  }
+
+  .panel-title {
+    font-size: 0.75rem;
+  }
+
+  .calendar-cell {
+    min-height: 38px;
+    padding: 2px 3px;
+  }
+
+  .calendar-day-num {
+    font-size: 0.75rem;
+  }
+
+  .calendar-pct {
+    font-size: 0.55rem;
+  }
+
+  .calendar-xp {
+    font-size: 0.5rem;
+  }
+
+  .character-name {
+    font-size: 0.9375rem;
+    white-space: normal;
+    line-height: 1.3;
+  }
+
+  .level-label,
+  .level-xp {
+    font-size: 0.75rem;
+  }
+
+  .stat-pill {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8125rem;
+  }
+
+  .panel-title {
+    font-size: 0.75rem;
+  }
+
+  .habit-name {
+    font-size: 0.9375rem;
+  }
+
+  .achievements-section .achievements-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .mental-choice-btn {
+    font-size: 0.8125rem;
   }
 }

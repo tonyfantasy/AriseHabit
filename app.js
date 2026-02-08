@@ -27,10 +27,10 @@
     character: null
   };
 
-  const XP_PER_HABIT_FULL = 15;
-  const XP_LEVELS = [0, 100, 250, 450, 700, 1000, 1400, 1900, 2500, 3200, 4000];
-
-  const ACHIEVEMENTS_LIST = [
+  // WHY: Config-driven XP/levels/achievements for tuning without code changes (see game-config.js).
+  var XP_PER_HABIT_FULL = (typeof AriseConfig !== 'undefined' && AriseConfig.getBaseXpPerHabit) ? AriseConfig.getBaseXpPerHabit() : 15;
+  var XP_LEVELS = (typeof AriseConfig !== 'undefined' && AriseConfig.getLevelCurve) ? AriseConfig.getLevelCurve() : [0, 100, 250, 450, 700, 1000, 1400, 1900, 2500, 3200, 4000];
+  var ACHIEVEMENTS_LIST = (typeof AriseConfig !== 'undefined' && AriseConfig.GAME_CONFIG && AriseConfig.GAME_CONFIG.achievements) ? AriseConfig.GAME_CONFIG.achievements : [
     { id: 'first_steps', name: 'Первый бой', desc: 'Выполнить первый квест в приключении', icon: '⚔️', tier: 'bronze' },
     { id: 'streak_3', name: 'Серия х3', desc: '3 дня подряд без перерыва — огонь не гаснет', icon: '🔥', tier: 'bronze' },
     { id: 'streak_7', name: 'Неделя в огне', desc: '7 дней подряд. Настоящая серия.', icon: '💎', tier: 'silver' },
@@ -223,29 +223,34 @@
     { id: 'other', label: 'Другое' }
   ];
 
-  // Ежедневные квесты: название + варианты исполнения (рандом на день)
+  // Ежедневные квесты: название + варианты исполнения (рандом на день). category used for default attributes (AriseHabit).
   const DEFAULT_HABITS = [
-    { id: 'default-sleep', name: 'Сон 7–8 часов', target: 1, reminders: ['22:30'], variations: ['Лечь до 23:00', 'Сон 7+ часов', 'Без экранов за час до сна'] },
-    { id: 'default-water-morning', name: 'Вода утром', target: 1, reminders: ['07:30'], variations: ['Стакан воды после пробуждения', 'Тёплая вода с лимоном', 'Два стакана воды до завтрака'] },
-    { id: 'default-warmup', name: 'Зарядка утром', target: 1, reminders: ['08:00'], variations: ['10 мин лёгкой разминки', 'Суставная гимнастика 5 мин', '5 мин потягиваний + 5 мин ходьбы'] },
-    { id: 'default-calisthenics', name: 'Силовая/калистеника', target: 1, reminders: ['08:30'], variations: ['10 приседаний + 10 отжиманий', 'Планка 1 мин + выпады', 'Бурпи 5 раз или отжимания 15'] },
-    { id: 'default-breakfast', name: 'Завтрак', target: 1, reminders: ['09:00'], variations: ['Завтрак в течение часа после подъёма', 'Завтрак с белком', 'Осознанный завтрак без телефона'] },
-    { id: 'default-water-day', name: 'Вода в течение дня', target: 1, reminders: ['12:00', '15:00'], variations: ['Норма воды за день', 'Стакан каждый час работы', '6–8 стаканов за день'] },
-    { id: 'default-walk-day', name: 'Свежий воздух', target: 1, reminders: ['12:30'], variations: ['Прогулка 15+ мин', 'Выйти на балкон/улицу 10 мин', 'Прогулка в обеденный перерыв'] },
-    { id: 'default-stretch-day', name: 'Растяжка/мобильность', target: 1, reminders: ['13:00', '15:30'], variations: ['Растяжка 5–10 мин', 'Йога-пауза 5 мин', 'Потянуться + наклоны 3 мин'] },
-    { id: 'default-reading', name: 'Чтение (мозг)', target: 1, reminders: ['19:00'], variations: ['Чтение 15–20 мин', '10 страниц книги', 'Статья или глава без соцсетей'] },
-    { id: 'default-breath', name: 'Дыхательная пауза', target: 1, reminders: ['11:00', '15:00'], variations: ['3 мин глубокого дыхания', '4-4-6: вдох 4, задержка 4, выдох 6', '5 вдохов животом'] },
-    { id: 'default-posture', name: 'Разминка/смена позы', target: 1, reminders: ['11:30', '14:30', '17:00'], variations: ['Встать, потянуться, пройтись', '3 мин ходьбы + круговые плечи', 'Встать каждый час на 2 мин'] },
-    { id: 'default-walk-evening', name: 'Вечерняя активность', target: 1, reminders: ['18:00'], variations: ['Вечерняя прогулка 15 мин', 'Лёгкая зарядка или растяжка', 'Прогулка после ужина'] },
-    { id: 'default-screens-off', name: 'Экраны перед сном', target: 1, reminders: ['21:00'], variations: ['Экраны выключить за час до сна', 'Режим «Не беспокоить» за 1 ч', 'Телефон вне спальни'] },
-    { id: 'default-stretch-evening', name: 'Растяжка вечером', target: 1, reminders: ['20:30'], variations: ['Растяжка перед сном 5 мин', 'Расслабление шеи и плеч', 'Йога на кровати 5 мин'] },
-    { id: 'default-ritual', name: 'Ритуал перед сном', target: 1, reminders: ['21:30'], variations: ['Чтение или дневник 10 мин', 'Чай без кофеина + тишина', 'План на завтра + 5 мин тишины'] }
+    { id: 'default-sleep', name: 'Сон 7–8 часов', target: 1, reminders: ['22:30'], variations: ['Лечь до 23:00', 'Сон 7+ часов', 'Без экранов за час до сна'], category: 'sleep' },
+    { id: 'default-water-morning', name: 'Вода утром', target: 1, reminders: ['07:30'], variations: ['Стакан воды после пробуждения', 'Тёплая вода с лимоном', 'Два стакана воды до завтрака'], category: 'water' },
+    { id: 'default-warmup', name: 'Зарядка утром', target: 1, reminders: ['08:00'], variations: ['10 мин лёгкой разминки', 'Суставная гимнастика 5 мин', '5 мин потягиваний + 5 мин ходьбы'], category: 'exercise' },
+    { id: 'default-calisthenics', name: 'Силовая/калистеника', target: 1, reminders: ['08:30'], variations: ['10 приседаний + 10 отжиманий', 'Планка 1 мин + выпады', 'Бурпи 5 раз или отжимания 15'], category: 'exercise' },
+    { id: 'default-breakfast', name: 'Завтрак', target: 1, reminders: ['09:00'], variations: ['Завтрак в течение часа после подъёма', 'Завтрак с белком', 'Осознанный завтрак без телефона'], category: 'exercise' },
+    { id: 'default-water-day', name: 'Вода в течение дня', target: 1, reminders: ['12:00', '15:00'], variations: ['Норма воды за день', 'Стакан каждый час работы', '6–8 стаканов за день'], category: 'water' },
+    { id: 'default-walk-day', name: 'Свежий воздух', target: 1, reminders: ['12:30'], variations: ['Прогулка 15+ мин', 'Выйти на балкон/улицу 10 мин', 'Прогулка в обеденный перерыв'], category: 'exercise' },
+    { id: 'default-stretch-day', name: 'Растяжка/мобильность', target: 1, reminders: ['13:00', '15:30'], variations: ['Растяжка 5–10 мин', 'Йога-пауза 5 мин', 'Потянуться + наклоны 3 мин'], category: 'exercise' },
+    { id: 'default-reading', name: 'Чтение (мозг)', target: 1, reminders: ['19:00'], variations: ['Чтение 15–20 мин', '10 страниц книги', 'Статья или глава без соцсетей'], category: 'reading' },
+    { id: 'default-breath', name: 'Дыхательная пауза', target: 1, reminders: ['11:00', '15:00'], variations: ['3 мин глубокого дыхания', '4-4-6: вдох 4, задержка 4, выдох 6', '5 вдохов животом'], category: 'breath' },
+    { id: 'default-posture', name: 'Разминка/смена позы', target: 1, reminders: ['11:30', '14:30', '17:00'], variations: ['Встать, потянуться, пройтись', '3 мин ходьбы + круговые плечи', 'Встать каждый час на 2 мин'], category: 'exercise' },
+    { id: 'default-walk-evening', name: 'Вечерняя активность', target: 1, reminders: ['18:00'], variations: ['Вечерняя прогулка 15 мин', 'Лёгкая зарядка или растяжка', 'Прогулка после ужина'], category: 'exercise' },
+    { id: 'default-screens-off', name: 'Экраны перед сном', target: 1, reminders: ['21:00'], variations: ['Экраны выключить за час до сна', 'Режим «Не беспокоить» за 1 ч', 'Телефон вне спальни'], category: 'screens_off' },
+    { id: 'default-stretch-evening', name: 'Растяжка вечером', target: 1, reminders: ['20:30'], variations: ['Растяжка перед сном 5 мин', 'Расслабление шеи и плеч', 'Йога на кровати 5 мин'], category: 'exercise' },
+    { id: 'default-ritual', name: 'Ритуал перед сном', target: 1, reminders: ['21:30'], variations: ['Чтение или дневник 10 мин', 'Чай без кофеина + тишина', 'План на завтра + 5 мин тишины'], category: 'ritual' }
   ];
 
+  // WHY: Ensures every habit has attributes for RPG-style progression (AriseHabit design).
   function normalizeHabit(habit) {
     if (!habit.reminders && habit.reminder) habit.reminders = [habit.reminder];
     if (!habit.reminders) habit.reminders = [];
     if (!habit.variations || !habit.variations.length) habit.variations = [habit.name || 'Квест'];
+    if (!habit.attributes && typeof AriseConfig !== 'undefined' && AriseConfig.getHabitAttributes) {
+      habit.attributes = AriseConfig.getHabitAttributes(habit);
+    }
+    if (!habit.streakRule) habit.streakRule = { type: 'daily' };
     return habit;
   }
 
@@ -292,6 +297,7 @@
     }
   }
 
+  // WHY: Migration for AriseHabit — extend character with attributes/perks without breaking existing saves.
   function loadCharacter() {
     try {
       const raw = localStorage.getItem(CHARACTER_KEY);
@@ -300,6 +306,16 @@
       if (state.character && state.character.lastActivityDate === undefined) state.character.lastActivityDate = null;
       if (state.character && state.character.xpAddedToday === undefined) state.character.xpAddedToday = 0;
       if (state.character && state.character.xpAddedTodayDate === undefined) state.character.xpAddedTodayDate = null;
+      if (state.character && !state.character.attributes) {
+        state.character.attributes = {};
+        if (typeof AriseConfig !== 'undefined' && AriseConfig.GAME_CONFIG && AriseConfig.GAME_CONFIG.attributes) {
+          AriseConfig.GAME_CONFIG.attributes.forEach(function (a) {
+            state.character.attributes[a.id] = 50;
+          });
+        }
+      }
+      if (state.character && !state.character.unlockedPerks) state.character.unlockedPerks = [];
+      if (state.character && !state.character.equippedPerks) state.character.equippedPerks = [];
     } catch (e) {
       state.character = null;
     }
@@ -321,16 +337,21 @@
     return (typeof HabitCore !== 'undefined' && HabitCore.xpAtLevelStart) ? HabitCore.xpAtLevelStart(level, XP_LEVELS) : (XP_LEVELS[level - 1] || 0);
   }
 
+  // WHY: Streak multiplier rewards consistency (engagement); applied once to daily total (config: game-config.js).
   function computeTodayXp() {
     const today = todayKey();
-    let xp = 0;
-    state.habits.forEach(h => {
+    var rawXp = 0;
+    state.habits.forEach(function (h) {
       const current = getCompletions(h.id, today);
       const target = Math.max(1, h.target || 1);
       const pct = Math.min(1, current / target);
-      xp += Math.round(pct * XP_PER_HABIT_FULL);
+      rawXp += pct * XP_PER_HABIT_FULL;
     });
-    return xp;
+    var streakMult = 1;
+    if (typeof AriseConfig !== 'undefined' && AriseConfig.getStreakMultiplier && state.character && state.character.streak) {
+      streakMult = AriseConfig.getStreakMultiplier(state.character.streak);
+    }
+    return Math.round(rawXp * streakMult);
   }
 
   function updateCharacterXp() {
@@ -1420,6 +1441,51 @@
         var reply = 'Спасибо, что написали. ' + assistantReplyIntro() + '\n\n' + tips.map(function(t, i) { return (i + 1) + '. ' + t; }).join('\n\n');
         showTypingThenReply(reply, 'advice_done');
       }
+    });
+
+    document.getElementById('feedbackForm')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var section = document.getElementById('feedbackSection');
+      var token = (section && section.dataset.feedbackBotToken) ? section.dataset.feedbackBotToken.trim() : '';
+      var chatId = (section && section.dataset.feedbackChatId) ? section.dataset.feedbackChatId.trim() : '';
+      var nameEl = document.getElementById('feedbackName');
+      var msgEl = document.getElementById('feedbackMessage');
+      var statusEl = document.getElementById('feedbackStatus');
+      var btn = document.getElementById('feedbackSubmitBtn');
+      var name = nameEl && nameEl.value ? nameEl.value.trim() : '';
+      var message = msgEl && msgEl.value ? msgEl.value.trim() : '';
+      if (!message) return;
+      if (!token || !chatId) {
+        if (statusEl) statusEl.textContent = 'Владелец сайта не настроил отправку в Telegram (нужны data-feedback-bot-token и data-feedback-chat-id).';
+        return;
+      }
+      var text = '📬 Обратная связь — Habit Tracker\n\n';
+      if (name) text += 'Имя: ' + name + '\n\n';
+      text += message;
+      text += '\n\n— из приложения Habit Tracker';
+      if (btn) { btn.disabled = true; btn.textContent = 'Отправка…'; }
+      if (statusEl) statusEl.textContent = '';
+      fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: text,
+          disable_web_page_preview: true
+        })
+      }).then(function(res) { return res.json(); }).then(function(data) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Отправить в Telegram'; }
+        if (data.ok) {
+          if (msgEl) msgEl.value = '';
+          if (nameEl) nameEl.value = '';
+          if (statusEl) { statusEl.textContent = 'Спасибо! Отзыв отправлен в Telegram.'; statusEl.className = 'feedback-status feedback-status-ok'; }
+        } else {
+          if (statusEl) { statusEl.textContent = 'Не удалось отправить: ' + (data.description || 'ошибка').slice(0, 80); statusEl.className = 'feedback-status feedback-status-err'; }
+        }
+      }).catch(function() {
+        if (btn) { btn.disabled = false; btn.textContent = 'Отправить в Telegram'; }
+        if (statusEl) { statusEl.textContent = 'Ошибка сети. Попробуйте позже.'; statusEl.className = 'feedback-status feedback-status-err'; }
+      });
     });
 
     if (!state.character) {
